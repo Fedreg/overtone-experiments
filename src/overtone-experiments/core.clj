@@ -85,6 +85,7 @@
   [mods dir]
   (case dir
     :back (reverse mods)
+    :ostn [(nth mods 0) (nth mods 1) (nth mods 2) (nth mods 1)]
     :else mods))
 
 (defn c! 
@@ -112,8 +113,8 @@
 (c! :C28maj7 true)
 (do 
   (c! :C28maj7 true :back)
-  (c! :A28min7 true)
-  (c! :F28maj7 true)
+  (c! :A28min7 true :ostn)
+  (c! :F28maj7 true :back)
   (c! :E28min7 true))
 
 (loop [x 4]
