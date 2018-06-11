@@ -52,12 +52,12 @@
 (defn get-duration
   "Returns duration mulitplier"
   [n]
-  1)
+  (/ 4.0 n))
 
 (defn get-duration-ms
   "Returns duration in ms"
   [n]
-  250)
+  (* 250.0 n))
 
 (defn n! 
   "Breaks note group down to pitch, octave, and duration"
@@ -71,14 +71,21 @@
 
 (defn arpeggiate
   "Plays each note of a chord individually"
-  [root oct dur mods delay]
+  [root oct dur mods]
   (let [xs    (first mods)
         ys    (rest mods)
         delay (get-duration-ms dur)]
     (tone (+ (root notes) xs oct) dur)
     (Thread/sleep delay)
     (when-not (empty? ys)
-      (arpeggiate root oct dur ys delay))))
+      (arpeggiate root oct dur ys))))
+
+(defn arpeggio-direction
+  "Determines the shape of apreggiagion"
+  [mods dir]
+  (case dir
+    :back (reverse mods)
+    :else mods))
 
 (defn c! 
   "Breaks note group down to pitch, octave, and duration and retunrs a chord"
@@ -90,23 +97,24 @@
         dur  (-> nums last str Integer/parseInt get-duration)
         func (-> note (str/split #"\d{2}") last keyword)
         mods (func chords)
-        arp? (first args)]
+        arp? (first args)
+        dir? (when (= 2 (count args)) (last args))]
     (if arp? 
-      (arpeggiate root oct dur mods 0)
+      (if dir?
+        (arpeggiate root oct dur (arpeggio-direction mods dir?))
+        (arpeggiate root oct dur mods))
       (pmap #(tone (+ (root notes) % oct) dur) mods))))
-
 
 (comment 
 
-(n! :C41)
+(n! :C48)
+
 (c! :C28maj7 true)
-(defn prog []
-  (do 
-    (c! :C28maj7 true)
-    (c! :A28min7 true)
-    (c! :F28maj7 true)
-    (c! :E28min7 true)
-    ))
+(do 
+  (c! :C28maj7 true :back)
+  (c! :A28min7 true)
+  (c! :F28maj7 true)
+  (c! :E28min7 true))
 
 (loop [x 4]
   (when (> x 0)
@@ -114,21 +122,21 @@
       (do
         (n! :E31)
         (do 
-          (c! :C28maj7 true)
-          (c! :A28min7 true)
-          (c! :F28maj7 true)
-          (c! :E28min7 true)))
+          (c! :C24maj7 true)
+          (c! :A24min7 true)
+          (c! :F24maj7 true)
+          (c! :E24min7 true)))
 
       (do 
         (n! :B31)
         (do
-          (c! :C28maj7 true)
-          (c! :A28min7 true)
-          (c! :F28maj true)
-          (c! :E28min true)
-          (n! :D21)
+          (c! :C24maj7 true)
+          (c! :A24min7 true)
+          (c! :F24maj true)
+          (c! :E24min true)
+          (n! :D24)
           (Thread/sleep 250)
-          (n! :B21)
+          (n! :B24)
           (Thread/sleep 250))))
     (recur (- x 1))))
 
