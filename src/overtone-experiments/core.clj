@@ -137,142 +137,22 @@
         (arpeggiate root oct dur mods))
       (pmap #(tone (+ (root notes) % oct) dur) mods))))
 
-(defmacro play! [notes]
+(defmacro play!
+  "Runs a sequence of notes, chords, or loops (Use a vector of multiple n, c, l for simultaneous playing)"
+  [notes]
   (let [xs (first notes)
         ys (rest notes)]
     (when xs
-      (eval xs)
+      (if (vector? xs)
+        (do
+          (prn (time (eval xs)))
+          (pmap eval xs))
+        (do
+          (prn (time (eval xs)))
+          (eval xs)))
       (let [duration (get-duration (-dur xs))]
         (Thread/sleep (* duration 500))
         (when-not (empty? `~ys)
           `(play! ~ys))))))
 
-(comment 
 
-(n! :C48)
-
-(do
-  (c! :C31maj )
-  (c! :A31min )
-  )
-
-(do
-(c! :C08maj7 true)
-(c! :C18maj7 true)
-(c! :C28maj7 true)
-(c! :C38maj7 true)
-(c! :C48maj7 true)
-(c! :C58maj7 true)
-(c! :C68maj7 true))
-
-(do 
-  (c! :C28maj7 true :back)
-  (c! :A28min7 true :ostn)
-  (c! :F28maj7 true :back)
-  (c! :E28min7 true))
-
-(loop [x 4]
-  (when (> x 0)
-    (if (even? x)
-      (do
-        (n! :E11)
-        (do 
-          (c! :C24maj7 true)
-          (c! :A24min7 true)
-          (c! :F24maj7 true)
-          (c! :E24min7 true)))
-
-      (do 
-        (n! :B11)
-        (do
-          (c! :C24maj7 true :back)
-          (c! :A24min7 true)
-          (c! :F24maj true)
-          (c! :E24min true)
-          (n! :D24)
-          (Thread/sleep 250)
-          (n! :B24)
-          (Thread/sleep 250))))
-    (recur (- x 1))))
-
-(defn a []
-  (loop [x 8]
-    (when (> x 0)
-      (if (even? x)
-        (do
-          (n! :A01)
-          (n! :C31)
-          (n! :E41)
-          (n! :A11)
-          (c! :A28min7 true))
-        (do 
-          (n! :E11)
-          (c! :A28min7 true :back)))
-      (recur (- x 1)))))
-
-(defn b []
-  (loop [x 8]
-    (when (> x 0)
-      (if (even? x)
-        (do
-          (n! :F01)
-          (n! :A31)
-          (n! :C41)
-          (n! :E11)
-          (c! :F28maj7 true))
-        (do 
-          (n! :F11)
-          (c! :F28maj7 true :back)))
-      (recur (- x 1)))))
-
-(defn c []
-  (loop [x 8]
-    (when (> x 0)
-      (if (even? x)
-        (do
-          (n! :D01)
-          (n! :F31)
-          (n! :A41)
-          (n! :Bb11)
-          (c! :D28min7 true))
-        (do 
-          (n! :D11)
-          (c! :D28min7 true :back)))
-      (recur (- x 1)))))
-
-  (get-last-note '(loop [x 8]
-                   (when (> x 0)
-                     (if (even? x)
-                       (do
-                         (n! :D01)
-                         (n! :F31)
-                         (n! :A41)
-                         (n! :Bb11)
-                         (c! :D28min7 true))
-                       (do 
-                         (n! :D11)
-                         (c! :D28min7 true :back)))
-                     (recur (- x 1)))))
-  
-(do 
-(a)
-(b)
-(a)
-(b)
-(c)
-(b)
-(a)
-(b))
-
-(play!
- [(n! :A24)
-  (n! :C34)
-  (n! :D38)
-  (n! :E38)
-  (c! :C34maj7 true)])
-
-(-dur '(c! :C34maj7 true))
-
-(-dur '(n! :A34))
-
-:end)

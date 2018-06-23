@@ -29,29 +29,29 @@
 :end)
 
 (defn test-song1 []
-(loop [x 4]
-  (when (> x 0)
-    (if (even? x)
-      (do
-        (n! :E11)
-        (do 
-          (c! :C24maj7 true)
-          (c! :A24min7 true)
-          (c! :F24maj7 true)
-          (c! :E24min7 true)))
-
-      (do 
-        (n! :B11)
+  (loop [x 4]
+    (when (> x 0)
+      (if (even? x)
         (do
-          (c! :C24maj7 true :back)
-          (c! :A24min7 true)
-          (c! :F24maj true)
-          (c! :E24min true)
-          (n! :D24)
-          (Thread/sleep 250)
-          (n! :B24)
-          (Thread/sleep 250))))
-    (recur (- x 1)))))
+          (n! :E11)
+          (do 
+            (c! :C24maj7 true)
+            (c! :A24min7 true)
+            (c! :F24maj7 true)
+            (c! :E24min7 true)))
+
+        (do 
+          (n! :B11)
+          (do
+            (c! :C24maj7 true :back)
+            (c! :A24min7 true)
+            (c! :F24maj true)
+            (c! :E24min true)
+            (n! :D24)
+            (Thread/sleep 250)
+            (n! :B24)
+            (Thread/sleep 250))))
+      (recur (- x 1)))))
 
 (defn a []
   (loop [x 8]
@@ -98,14 +98,36 @@
           (c! :D28min7 true :back)))
       (recur (- x 1)))))
 
-(defn test-song1 []
+(defn test-song2 []
   (do 
     (a)(b)(a)(b)
     (c)(b)(a)(b)))
 
-(play!
- [(n! :A24)
-  (n! :C34)
-  (n! :D38)
-  (n! :E38)
-  (c! :C34maj7 true)])
+
+(defn counterpoint []
+  (play! [
+   [(n! :A21) (n! :C21)]
+   [(n! :G21) (n! :D21)]
+   [(n! :A22) (n! :D22)]
+   [(n! :E22) (n! :B22)]
+   [(n! :A21) (n! :C21)]
+   ]))
+
+(comment
+
+  (play!
+   [(n! :A24)
+    (n! :C34)
+    (n! :D38)
+    (n! :E38)
+    (c! :C34maj7 true)])
+
+  (play! [(n! :A24) [(n! :A24)(n! :C24)](n! :E24)])
+
+  (test-song1)
+
+  (test-song2)
+
+  (counterpoint)
+
+  :end)
