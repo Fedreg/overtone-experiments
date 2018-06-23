@@ -3,10 +3,14 @@
         overtone.inst.synth)
   (:require [clojure.string :as str]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Util Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (definst tone
   "Basic synth"
   [note 60 dur 1.01 vol 0.3]
-  (let [snd (square (midicps note))
+  (let [snd (saw (midicps note))
         env (env-gen (perc 0.1 dur))]
     (* env snd vol)))
 
@@ -59,16 +63,6 @@
   [n]
   (* 250.0 n))
 
-(defn n! 
-  "Breaks note group down to pitch, octave, and duration"
-  [note]
-  (let [note (name note)
-        name (-> note (str/split #"\d") first keyword)
-        nums (last (str/split note #"\D"))
-        oct  (-> nums first str Integer/parseInt get-octave)
-        dur  (-> nums last str Integer/parseInt get-duration)]
-    (tone (+ (name notes) oct) dur)))
-
 (defn arpeggiate
   "Plays each note of a chord individually"
   [root oct dur mods]
@@ -88,6 +82,43 @@
     :ostn [(nth mods 0) (nth mods 1) (nth mods 2) (nth mods 1)]
     :else mods))
 
+(defn get-last-note
+  "Gets the final note or chord out of a loop"
+  [loop]
+  (let [end (-> loop last butlast last last last)]
+    end))
+
+(defn -dur
+  "Gets the duration out of a note or chord"
+  [note]
+  (let [-note (if (= 'loop (first note))
+                (get-last-note note)
+                note)
+        nums  (-> -note 
+                  second
+                  str
+                  (str/split #"\D"))
+        parser #(-> % second str (Integer/parseInt))
+        dur   (if (= 3 (count nums))
+                ;; (-> nums last second str (Integer/parseInt))
+                (-> nums last parser)
+                (->> nums (remove empty?) first parser))]
+    dur))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Main Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn n! 
+  "Breaks note group down to pitch, octave, and duration"
+  [note]
+  (let [note (name note)
+        name (-> note (str/split #"\d") first keyword)
+        nums (last (str/split note #"\D"))
+        oct  (-> nums first str Integer/parseInt get-octave)
+        dur  (-> nums last str Integer/parseInt get-duration)]
+    (tone (+ (name notes) oct) dur)))
+
 (defn c! 
   "Breaks note group down to pitch, octave, and duration and retunrs a chord"
   [chord & args]
@@ -106,11 +137,34 @@
         (arpeggiate root oct dur mods))
       (pmap #(tone (+ (root notes) % oct) dur) mods))))
 
+(defmacro play! [notes]
+  (let [xs (first notes)
+        ys (rest notes)]
+    (when xs
+      (eval xs)
+      (let [duration (get-duration (-dur xs))]
+        (Thread/sleep (* duration 500))
+        (when-not (empty? `~ys)
+          `(play! ~ys))))))
+
 (comment 
 
 (n! :C48)
 
+(do
+  (c! :C31maj )
+  (c! :A31min )
+  )
+
+(do
+(c! :C08maj7 true)
+(c! :C18maj7 true)
 (c! :C28maj7 true)
+(c! :C38maj7 true)
+(c! :C48maj7 true)
+(c! :C58maj7 true)
+(c! :C68maj7 true))
+
 (do 
   (c! :C28maj7 true :back)
   (c! :A28min7 true :ostn)
@@ -121,7 +175,7 @@
   (when (> x 0)
     (if (even? x)
       (do
-        (n! :E31)
+        (n! :E11)
         (do 
           (c! :C24maj7 true)
           (c! :A24min7 true)
@@ -129,9 +183,9 @@
           (c! :E24min7 true)))
 
       (do 
-        (n! :B31)
+        (n! :B11)
         (do
-          (c! :C24maj7 true)
+          (c! :C24maj7 true :back)
           (c! :A24min7 true)
           (c! :F24maj true)
           (c! :E24min true)
@@ -140,5 +194,85 @@
           (n! :B24)
           (Thread/sleep 250))))
     (recur (- x 1))))
+
+(defn a []
+  (loop [x 8]
+    (when (> x 0)
+      (if (even? x)
+        (do
+          (n! :A01)
+          (n! :C31)
+          (n! :E41)
+          (n! :A11)
+          (c! :A28min7 true))
+        (do 
+          (n! :E11)
+          (c! :A28min7 true :back)))
+      (recur (- x 1)))))
+
+(defn b []
+  (loop [x 8]
+    (when (> x 0)
+      (if (even? x)
+        (do
+          (n! :F01)
+          (n! :A31)
+          (n! :C41)
+          (n! :E11)
+          (c! :F28maj7 true))
+        (do 
+          (n! :F11)
+          (c! :F28maj7 true :back)))
+      (recur (- x 1)))))
+
+(defn c []
+  (loop [x 8]
+    (when (> x 0)
+      (if (even? x)
+        (do
+          (n! :D01)
+          (n! :F31)
+          (n! :A41)
+          (n! :Bb11)
+          (c! :D28min7 true))
+        (do 
+          (n! :D11)
+          (c! :D28min7 true :back)))
+      (recur (- x 1)))))
+
+  (get-last-note '(loop [x 8]
+                   (when (> x 0)
+                     (if (even? x)
+                       (do
+                         (n! :D01)
+                         (n! :F31)
+                         (n! :A41)
+                         (n! :Bb11)
+                         (c! :D28min7 true))
+                       (do 
+                         (n! :D11)
+                         (c! :D28min7 true :back)))
+                     (recur (- x 1)))))
+  
+(do 
+(a)
+(b)
+(a)
+(b)
+(c)
+(b)
+(a)
+(b))
+
+(play!
+ [(n! :A24)
+  (n! :C34)
+  (n! :D38)
+  (n! :E38)
+  (c! :C34maj7 true)])
+
+(-dur '(c! :C34maj7 true))
+
+(-dur '(n! :A34))
 
 :end)
