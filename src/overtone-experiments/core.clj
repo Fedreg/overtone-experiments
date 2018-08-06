@@ -10,7 +10,7 @@
 (definst tone
   "Basic synth"
   [note 60 dur 1.01 vol 0.3]
-  (let [snd (saw (midicps note))
+  (let [snd (square (midicps note))
         env (env-gen (perc 0.1 dur))]
     (* env snd vol)))
 
@@ -142,17 +142,20 @@
   [notes]
   (let [xs (first notes)
         ys (rest notes)]
-    (when xs
-      (if (vector? xs)
-        (do
-          (prn (time (eval xs)))
-          (pmap eval xs))
-        (do
-          (prn (time (eval xs)))
-          (eval xs)))
-      (let [duration (get-duration (-dur xs))]
-        (Thread/sleep (* duration 500))
-        (when-not (empty? `~ys)
-          `(play! ~ys))))))
+    (if (vector? xs)
+      (pmap eval xs)
+      (eval xs))
+    (when (or (= 'n! (first xs))
+              (= 'n! (-> xs first first)))
+      (Thread/sleep (* 500 (get-duration (-dur xs)))))
+    (when-not (empty? `~ys)
+      `(play! ~ys))))
 
+(defmacro l-play!
+  "Loops around the play macro"
+  [reps notes]
+  (loop [x reps]
+    (when (> x 0)
+      (eval `(play! ~notes))
+      (recur (dec x)))))
 

@@ -1,24 +1,25 @@
 (ns overtone-experiments.songs
   (:require
-   [overtone-experiments.core :refer [c! n! play!]]))
+   [overtone-experiments.core :refer [c! n! play! l-play!]]))
 
 (comment 
 
 (n! :C48)
 
 (do
-  (c! :C31maj )
-  (c! :A31min )
+  (c! :C31maj true)
+  (c! :A31min true :back)
   )
 
-(do
-(c! :C08maj7 true)
-(c! :C18maj7 true)
-(c! :C28maj7 true)
-(c! :C38maj7 true)
-(c! :C48maj7 true)
-(c! :C58maj7 true)
-(c! :C68maj7 true))
+(def arpy
+  (play! [
+          (c! :C08maj7 true)
+          (c! :C18maj7 true)
+          (c! :C28maj7 true)
+          (c! :C38maj7 true)
+          (c! :C48maj7 true)
+          (c! :C58maj7 true)
+          (c! :C68maj7 true)]))
 
 (do 
   (c! :C28maj7 true :back)
@@ -109,7 +110,7 @@
    [(n! :A21) (n! :C21)]
    [(n! :G21) (n! :D21)]
    [(n! :A22) (n! :D22)]
-   [(n! :E22) (n! :B22)]
+   [(n! :F22) (n! :B22)]
    [(n! :A21) (n! :C21)]
    ]))
 
@@ -126,8 +127,40 @@
 
   (test-song1)
 
-  (test-song2)
+ (test-song2)
 
   (counterpoint)
 
-  :end)
+  (play! [(n! :A32)])
+
+(play!
+ 2
+ [[(c! :A32min7 true) (c! :F22maj7 true)]
+  [(c! :A32min7 true :back) (c! :F22maj7 true :back)]])
+
+(l-play! 2 [
+        [(n! :A32) (n! :F22)]
+        [(n! :G32) (n! :A22)]
+        ])
+
+(play!
+ [[(c! :A38min7 true)
+   (c! :A38min7 true :back)
+   (c! :D38min7 true)
+   (c! :E38min7 true :back)]
+
+  [(c! :E38min7 true)
+   (c! :E38min7 true :back)
+   (c! :A38min7 true)
+   (c! :E38min7 true :back)]])
+
+(defn bass []
+  [(n! :A22)
+   (n! :E22)
+   (n! :D22)
+   (n! :E22)])
+
+(play! [(bass)])
+
+:end)
+
