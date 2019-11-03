@@ -3,6 +3,7 @@
         overtone.inst.synth)
   (:require [clojure.string :as str]))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Util Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -143,10 +144,13 @@
   (let [xs (first notes)
         ys (rest notes)]
     (if (vector? xs)
-      (pmap eval xs)
+      (if (= 'c! (-> xs first first))
+        (map eval xs)
+        (pmap eval xs))
       (eval xs))
     (when (or (= 'n! (first xs))
-              (= 'n! (-> xs first first)))
+              (when (vector? xs)
+                (= 'n! (-> xs first first))))
       (Thread/sleep (* 500 (get-duration (-dur xs)))))
     (when-not (empty? `~ys)
       `(play! ~ys))))

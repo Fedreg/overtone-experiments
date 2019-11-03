@@ -4,11 +4,36 @@
 
 (comment 
 
-(n! :C48)
+(n! :C11)
+;; C11:
+;; "C" -> note name
+;; "1" (fisrt digit) is octave
+;; "1" (second digit) is duration.  1 for whole; 2 for half, etc
+;; C48 would be a C4 eitght note
+
+(defn easy-song [oct]
+  (let [chord (keyword (str "C" oct "8maj7"))]
+    (do
+      (c! chord true)
+      (c! chord true :back)
+      )))
 
 (do
-  (c! :C31maj true)
-  (c! :A31min true :back)
+  (easy-song 1)
+  (easy-song 2)
+  (easy-song 3)
+  (easy-song 4)
+  (easy-song 4)
+  (easy-song 3)
+  (easy-song 2)
+  (easy-song 1)
+  (easy-song 1)
+  (easy-song 4)
+  (easy-song 8)
+  (easy-song 4)
+  (easy-song 1)
+  (easy-song 2)
+  (easy-song 1)
   )
 
 (def arpy
@@ -19,7 +44,30 @@
           (c! :C38maj7 true)
           (c! :C48maj7 true)
           (c! :C58maj7 true)
-          (c! :C68maj7 true)]))
+          (c! :C68maj7 true)
+          (c! :C68maj7 true :back)
+          (c! :C58maj7 true :back)
+          (c! :C48maj7 true :back)
+          (c! :C38maj7 true :back)
+          (c! :C28maj7 true :back)
+          (c! :C18maj7 true :back)
+          (c! :C08maj7 true :back)
+
+          (c! :A08min7 true)
+          (c! :A18min7 true)
+          (c! :A28min7 true)
+          (c! :A38min7 true)
+          (c! :A48min7 true)
+          (c! :A58min7 true)
+          (c! :A68min7 true)
+          (c! :A68min7 true :back)
+          (c! :A58min7 true :back)
+          (c! :A48min7 true :back)
+          (c! :A38min7 true :back)
+          (c! :A28min7 true :back)
+          (c! :A18min7 true :back)
+          (c! :A08min7 true :back)
+          ]))
 
 (do 
   (c! :C28maj7 true :back)
@@ -106,7 +154,7 @@
 
 
 (defn counterpoint []
-  (play! [
+  '(play! [
    [(n! :A21) (n! :C21)]
    [(n! :G21) (n! :D21)]
    [(n! :A22) (n! :D22)]
@@ -129,19 +177,34 @@
 
  (test-song2)
 
-  (counterpoint)
+  (eval (counterpoint))
 
   (play! [(n! :A32)])
 
-(play!
+(l-play!
  2
  [[(c! :A32min7 true) (c! :F22maj7 true)]
   [(c! :A32min7 true :back) (c! :F22maj7 true :back)]])
 
-(l-play! 2 [
-        [(n! :A32) (n! :F22)]
-        [(n! :G32) (n! :A22)]
-        ])
+(def a
+  '(l-play! 6 [
+               [(n! :A38) (n! :F28)]
+               [(n! :G38) (n! :A28)]
+               ]))
+
+(def b
+  '(l-play! 2 [
+               [(n! :A38) (n! :F28)]
+               [(n! :B38) (n! :F28)]
+               [(n! :G38) (n! :A28)]
+               ]))
+
+(do
+  (eval a)
+  (eval b)
+  (eval a)
+  (eval b)
+  )
 
 (play!
  [[(c! :A38min7 true)
