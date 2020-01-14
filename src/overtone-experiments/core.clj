@@ -15,6 +15,11 @@
         env (env-gen (perc 0.1 dur))]
     (* env snd vol)))
 
+(comment
+  (midi-player-stop tone)
+
+:end)
+
 (def notes
   {:C  21
    :C# 22
@@ -163,3 +168,9 @@
       (eval `(play! ~notes))
       (recur (dec x)))))
 
+(comment
+  ;; From Overtone GH
+  (demo 7 (lpf (mix (saw [50 (line 100 1600 5) 101 100.5]))
+               (lin-lin (lf-tri (line 2 20 5)) -1 1 400 4000)))
+
+  :end)
